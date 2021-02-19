@@ -6,7 +6,7 @@
         v-for="(details, itemId) in items"
         :key="itemId"
         :itemId="itemId"
-        :amount="details.amount"
+        :details="details"
       />
     </div>
   </li>
@@ -14,6 +14,7 @@
 
 <script>
 import { mapGetters } from 'vuex'
+import moment from 'moment'
 
 import Item from './Item.vue'
 
@@ -35,23 +36,21 @@ export default {
       const items = {}
 
       for (const loot of this.filteredLoot) {
-        if (loot.by !== this.playerName) {
+        if (loot.lootedBy !== this.playerName) {
           continue
         }
 
-        if (items[loot.id] == null) {
-          items[loot.id] = {
-            id: loot.id,
-            amount: 0,
-            date: [],
-            from: []
+        if (items[loot.itemId] == null) {
+          items[loot.itemId] = {
+            history: []
           }
         }
 
-        items[loot.id].date.push(loot.date)
-        items[loot.id].from.push(loot.from)
-
-        items[loot.id].amount += loot.amount
+        items[loot.itemId].history.push({
+          lootedAt: moment(loot.lootedAt, 'DD-MM-YYYY hh:mm:ss'),
+          lootedFrom: loot.lootedFrom,
+          amount: loot.amount
+        })
       }
 
       return items

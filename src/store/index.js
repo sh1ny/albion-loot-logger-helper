@@ -37,13 +37,13 @@ export default new Vuex.Store({
           continue
         }
 
-        const date = result[1]
-        const by = result[2]
-        const id = result[3]
+        const lootedAt = result[1]
+        const lootedBy = result[2]
+        const itemId = result[3]
         const amount = parseInt(result[4], 10)
-        const from = result[5]
+        const lootedFrom = result[5]
 
-        loot.push({ date, by, id, amount, from })
+        loot.push({ lootedAt, lootedBy, itemId, amount, lootedFrom })
       }
 
       state.lootLogs.push(loot)
@@ -77,7 +77,7 @@ export default new Vuex.Store({
 
       for (const logs of state.lootLogs) {
         for (const item of logs) {
-          allPlayers.add(item.by)
+          allPlayers.add(item.lootedBy)
         }
       }
 
@@ -112,7 +112,7 @@ export default new Vuex.Store({
     },
     filteredLoot(state, getters) {
       return getters.allLoot.filter(loot => {
-        const hideItem = getters.filterPatterns.some(pattern => loot.id.match(pattern))
+        const hideItem = getters.filterPatterns.some(pattern => loot.itemId.match(pattern))
 
         return !hideItem
       })
