@@ -20,10 +20,10 @@ export default {
   },
   computed: {
     url() {
-      return `https://render.albiononline.com/v1/item/${this.itemId}.png?count=1&quality=1&size=217`;
+      return `https://render.albiononline.com/v1/item/${this.itemId}.png?count=1&quality=1&size=217`
     }
   }
-};
+}
 </script>
 
 <style scoped>
