@@ -1,0 +1,35 @@
+name: website
+
+on: push
+
+env:
+  NODE_VERSION: '14.x'                # set this to the node version to use
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      -
+        name: Checkout
+        uses: actions/checkout@v2
+      -
+        name: Use Node.js ${{ env.NODE_VERSION }}
+        uses: actions/setup-node@v1
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+      -
+        name: npm install, build, and test
+        run: |
+          npm install
+          NODE_ENV=production npm run build --if-present
+          npm run test --if-present
+      -
+        name: Deploy to GitHub Pages
+        if: success()
+        uses: crazy-max/ghaction-github-pages@v2
+        with:
+          target_branch: gh-pages
+          build_dir: dist
+          fqdn: matheus.sampaio.us/albion-loot-logger-helper
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
