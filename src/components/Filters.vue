@@ -1,12 +1,13 @@
 <template>
   <div class="filters">
     <h3>Show</h3>
-    <ul>
-      <li v-for="(value, name) in filters" :key="name">
-        <input type="checkbox" v-model="filters[name]" :id="name">
-        <label :for="name">{{ name }}</label>
-      </li>
-    </ul>
+
+    <div>
+      <div v-for="(value, name) in filters" :key="name" class="form-check form-check-inline">
+        <input class="form-check-input" type="checkbox" v-model="filters[name]" :id="name">
+        <label class="form-check-label" :for="name">{{ name }}</label>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -33,14 +34,12 @@ export default {
   margin-top: 32px;
 }
 
-li {
-  display: inline-block;
-  margin-right: 16px;
+.form-check-inline {
+  margin-right: 1.5em;
 }
 
 label {
-  margin-left: 8px;
-  margin-right: 16px;
+  text-transform: capitalize;
 }
 </style>
 

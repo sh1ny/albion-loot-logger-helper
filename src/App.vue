@@ -2,7 +2,7 @@
   <div class="home" @drop.prevent="drop" @dragover.prevent>
     <Filters/>
     
-    <table id="loot-table">
+    <table id="loot-table" class="table table-bordered" v-if="filteredPlayers.length">
       <thead>
         <tr>
           <th>Name</th>
@@ -92,7 +92,7 @@ export default {
 
 <style>
 html, body, .home {
-  height: 100%;
+  min-height: 100vh;
   width: 100%;
 }
 
@@ -105,6 +105,7 @@ html, body, .home {
 #loot-table {
   width: 80%;
   max-width: 1280px;
+  margin-bottom: 32px;
 }
 
 table {
@@ -112,12 +113,10 @@ table {
   border-spacing: 0px;
 }
 
-th, td {
-  border: 1px solid #CCCCCC;
-  box-sizing: border-box;
-}
-
 th {
   padding: 8px;
+  text-align: center;
+  min-width: 200px;
+  vertical-align: middle;
 }
 </style>

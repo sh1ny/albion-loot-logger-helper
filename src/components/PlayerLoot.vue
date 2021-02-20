@@ -143,6 +143,7 @@ export default {
 .player-name {
   text-align: center;
   min-width: 200px;
+  vertical-align: middle;
 }
 
 .items {

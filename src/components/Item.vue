@@ -78,7 +78,7 @@ img {
   font-size: 0.8em;
   position: relative;
   right: 1.8em;
-  top: -1.3em;
+  top: 1.5em;
   color: white;
 }
 
