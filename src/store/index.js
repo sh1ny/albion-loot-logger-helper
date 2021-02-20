@@ -1,5 +1,6 @@
 import Vue from "vue"
 import Vuex from "vuex"
+import moment from 'moment'
 
 import regex from '../utils/regex'
 import items from '../utils/items.json'
@@ -39,7 +40,7 @@ export default new Vuex.Store({
           continue
         }
 
-        const lootedAt = result[1]
+        const lootedAt = moment(result[1], 'DD-MM-YYYY hh:mm:ss')
         const lootedBy = result[2]
         const itemId = result[3]
         const amount = parseInt(result[4], 10)
@@ -77,7 +78,7 @@ export default new Vuex.Store({
           continue
         }
 
-        const donatedAt = result[1]
+        const donatedAt = moment(result[1], 'DD-MM-YYYY hh:mm:ss')
         const donatedBy = result[2]
         const itemName = result[3]
         const itemEnchant = parseInt(result[4], 10)
@@ -122,7 +123,7 @@ export default new Vuex.Store({
         }
       }
 
-      return Array.from(allPlayers).sort((a, b) => a.localeCompare(b))
+      return Array.from(allPlayers)
     },
     selectedPlayers(state) {
       const selectedPlayers = new Set()
@@ -142,11 +143,54 @@ export default new Vuex.Store({
 
       return getters.allPlayers.filter(player => getters.selectedPlayers.includes(player))
     },
+    totalLootedByPlayer(state, getters) {
+      const totalLooted = {}
+
+      for (const log of getters.filteredLoot) {
+        totalLooted[log.lootedBy] = (totalLooted[log.lootedBy] || 0) + log.amount
+      }
+
+      return totalLooted
+    },
+    sortedFilteredPlayers(state, getters) {
+      return getters.filteredPlayers
+        .slice()
+        .sort((p1, p2) => (getters.totalLootedByPlayer[p2] || 0) - (getters.totalLootedByPlayer[p1] || 0))
+    },
     allLoot(state) {
       const loot = []
       
+      console.log('allLoot')
+
       for (const logs of state.lootLogs) {
-        loot.push(...logs)
+        for (const log of logs) {
+          const isDuplicate = loot.some(e => {
+            // if the player looted different players, it is definetly not a duplicate.
+            if (e.lootedFrom !== log.lootedFrom) {
+              return false
+            }
+
+            if (e.lootedBy !== log.lootedBy) {
+              return false
+            }
+
+            if (e.itemId !== log.itemId) {
+              return false
+            }
+
+            const diff = Math.abs(e.lootedAt.diff(log.lootedAt))
+
+            // if looted from the same player, in a very short time window, it is
+            // probably a duplicate
+            return diff <= 5000
+          })
+
+          console.log(isDuplicate, log.lootedBy, log.lootedFrom, log.itemId)
+
+          if (!isDuplicate) {
+            loot.push(log)
+          }
+        }
       }
 
       return loot

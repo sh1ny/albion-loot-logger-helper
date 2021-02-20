@@ -2,7 +2,7 @@
   <div class="home" @drop.prevent="drop" @dragover.prevent>
     <Filters/>
     
-    <table id="loot-table" class="table table-bordered" v-if="filteredPlayers.length">
+    <table id="loot-table" class="table table-bordered" v-if="sortedFilteredPlayers.length">
       <thead>
         <tr>
           <th>Name</th>
@@ -10,7 +10,7 @@
         </tr>
       </thead>
       <tbody>
-        <PlayerLoot v-for="playerName in filteredPlayers" :key="playerName" :player-name="playerName"/>
+        <PlayerLoot v-for="playerName in sortedFilteredPlayers" :key="playerName" :player-name="playerName"/>
       </tbody>
     </table>
   </div>
@@ -30,7 +30,7 @@ export default {
   },
   computed: {
     ...mapGetters([
-      'filteredPlayers'
+      'sortedFilteredPlayers'
     ])
   },
   methods: {

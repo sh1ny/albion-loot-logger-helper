@@ -15,7 +15,6 @@
 
 <script>
 import { mapGetters, mapState } from 'vuex'
-import moment from 'moment'
 import _ from 'lodash'
 
 import Item from './Item.vue'
@@ -79,41 +78,18 @@ export default {
         }
 
         items[loot.itemId].history.push({
-          lootedAt: moment(loot.lootedAt, 'DD-MM-YYYY hh:mm:ss'),
+          lootedAt: loot.lootedAt,
           lootedFrom: loot.lootedFrom,
           amount: loot.amount
         })
       }
 
-      // remove duplicated entries and calculate the final amount of units
       for (const itemId in items) {
         const details = items[itemId]
-        const filteredHistory = []
 
-        for (const item of details.history) {
-          const isDuplicate = filteredHistory.some(e => {
-            // if the player looted different players, it is definetly not a duplicate.
-            if (e.lootedFrom !== item.lootedFrom) {
-              return false
-            }
-
-            const diff = Math.abs(e.lootedAt.diff(item.lootedAt))
-
-            // if looted from the same player, in a very short time window, it is
-            // probably a duplicate
-            return diff <= 5000
-          })
-
-          if (!isDuplicate) {
-            filteredHistory.push(item)
-          }
-        }
-
-        for (const history of filteredHistory) {
+        for (const history of details.history) {
           details.amount += history.amount
         }
-
-        details.history = filteredHistory
       }
 
       return items
