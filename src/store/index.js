@@ -222,8 +222,35 @@ export default new Vuex.Store({
       }
 
       if (!state.filters.mount) {
-        // FIXME: _MOUNT_ is very generic, it'll filter battle mounts.
-        filterPatterns.push(/_MOUNT_/)
+        filterPatterns.push(/_MOUNT_MULE/)
+        filterPatterns.push(/_MOUNT_HORSE/)
+        filterPatterns.push(/_MOUNT_ARMORED_HORSE/)
+        filterPatterns.push(/_MOUNT_OX/)
+        filterPatterns.push(/_MOUNT_GIANTSTAG/)
+        filterPatterns.push(/_MOUNT_DIREWOLF/)
+        filterPatterns.push(/_MOUNT_DIREBOAR/)
+        filterPatterns.push(/_MOUNT_SWAMPDRAGON/)
+        filterPatterns.push(/_MOUNT_DIREBEAR/)
+        filterPatterns.push(/_MOUNT_MOABIRD_FW_BRIDGEWATCH/)
+        filterPatterns.push(/_MOUNT_DIREBEAR_FW_FORTSTERLING/)
+        filterPatterns.push(/_MOUNT_DIREBOAR_FW_LYMHURST/)
+        filterPatterns.push(/_MOUNT_RAM_FW_MARTLOCK/)
+        filterPatterns.push(/_MOUNT_SWAMPDRAGON_FW_THETFORD/)
+        filterPatterns.push(/_MOUNT_HORSE_UNDEAD@1/)
+        filterPatterns.push(/_MOUNT_COUGAR_KEEPER@1/)
+        filterPatterns.push(/_MOUNT_ARMORED_HORSE_MORGANA@1/)
+        filterPatterns.push(/UNIQUE_MOUNT_BAT_PERSONAL/)
+        filterPatterns.push(/_MOUNT_MONITORLIZARD_ADC/)
+        filterPatterns.push(/_MOUNT_HUSKY_ADC/)
+        filterPatterns.push(/_MOUNT_FROSTRAM_ADC/)
+        filterPatterns.push(/_MOUNT_TERRORBIRD_ADC/)
+        filterPatterns.push(/UNIQUE_MOUNT_BEAR_KEEPER_ADC/)
+        filterPatterns.push(/UNIQUE_MOUNT_BLACK_PANTHER_ADC/)
+        filterPatterns.push(/UNIQUE_MOUNT_MORGANA_RAVEN_ADC/)
+        filterPatterns.push(/UNIQUE_MOUNT_GIANT_HORSE_ADC/)
+        filterPatterns.push(/UNIQUE_MOUNT_UNDEAD_DIREBOAR_ADC/)
+        filterPatterns.push(/UNIQUE_MOUNT_DIVINE_OWL_ADC/)
+        filterPatterns.push(/UNIQUE_MOUNT_HERETIC_MULE_ADC/)
       }
 
       if (!state.filters.others) {
