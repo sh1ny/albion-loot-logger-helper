@@ -1,5 +1,7 @@
 <template>
   <div class="home" @drop.prevent="drop" @dragover.prevent>
+    <h3>Loot Logger Viewer</h3>
+
     <Filters/>
     
     <table id="loot-table" class="table table-bordered" v-if="filteredPlayers.length">
@@ -100,6 +102,7 @@ html, body, .home {
   display: flex;
   align-items: center;
   flex-direction: column;
+  padding-top: 16px;
 }
 
 #loot-table {

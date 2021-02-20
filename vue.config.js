@@ -5,7 +5,7 @@ module.exports = {
   pages: {
     index: {
       entry: 'src/main.js',
-      title: 'Loot Logger Helper - Albion Online'
+      title: 'Loot Logger Viewer - Albion Online'
     }
   }
 }

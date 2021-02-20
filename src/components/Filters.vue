@@ -1,7 +1,5 @@
 <template>
   <div class="container">
-    <h3>Filters</h3>
-
     <div class="filters">
       <div v-for="(value, name) in filters" :key="name" class="filter">
         <button @click="filters[name] = !filters[name]" :id="name">
@@ -35,10 +33,6 @@ export default {
   align-items: center;
   margin-bottom: 32px;
   margin-top: 32px;
-}
-
-h3 {
-  margin-bottom: 32px;
 }
 
 .filters {
