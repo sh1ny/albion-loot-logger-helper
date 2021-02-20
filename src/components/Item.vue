@@ -26,7 +26,7 @@ export default {
       return `https://render.albiononline.com/v1/item/${this.itemId}.png?count=1&quality=1&size=217`
     },
     title() {
-      const items = this.filteredHistory
+      const items = this.details.history
         .map(e => `Looted ${e.amount}x from ${e.lootedFrom} at ${e.lootedAt.format('DD-MM-YYYY hh:mm:ss')}`)
 
       return [
@@ -49,34 +49,10 @@ export default {
     filteredDonations() {
       return this.donations[this.itemId] || []
     },
-    filteredHistory() {
-      const filteredHistory = []
-
-      for (const item of this.details.history) {
-        const isDuplicate = filteredHistory.some(e => {
-          // if the player looted different players, it is definetly not a duplicate.
-          if (e.lootedFrom !== item.lootedFrom) {
-            return false
-          }
-
-          const diff = Math.abs(e.lootedAt.diff(item.lootedAt))
-
-          // if looted from the same player, in a very short time window, it is
-          // probably a duplicate
-          return diff <= 5000
-        })
-
-        if (!isDuplicate) {
-          filteredHistory.push(item)
-        }
-      }
-
-      return filteredHistory
-    },
     amount() {
       let amount = 0
 
-      for (const item of this.filteredHistory) {
+      for (const item of this.details.history) {
         amount += item.amount
       }
 
