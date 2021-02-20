@@ -1,5 +1,5 @@
 <template>
-  <div class="item">
+  <div class="item" :class="{ donated: donatedAll }">
     <img :src="url" :alt="title" :title="title" />
     <span class="amount">{{ amount }}</span>
   </div>
@@ -15,6 +15,10 @@ export default {
     details: {
       type: Object,
       required: true
+    },
+    donations: {
+      type: Object,
+      required: true
     }
   },
   computed: {
@@ -22,9 +26,28 @@ export default {
       return `https://render.albiononline.com/v1/item/${this.itemId}.png?count=1&quality=1&size=217`
     },
     title() {
-      return this.filteredHistory
+      const items = this.filteredHistory
         .map(e => `Looted ${e.amount}x from ${e.lootedFrom} at ${e.lootedAt.format('DD-MM-YYYY hh:mm:ss')}`)
-        .join('\n')
+
+      return [
+        this.itemId,
+        ...items
+      ].join('\n')
+    },
+    donatedAmount() {
+      let amount = 0
+
+      for (const donation of this.filteredDonations) {
+        amount += donation.amount
+      }
+
+      return amount
+    },
+    donatedAll() {
+      return this.donatedAmount >= this.amount
+    },
+    filteredDonations() {
+      return this.donations[this.itemId] || []
     },
     filteredHistory() {
       const filteredHistory = []
@@ -78,5 +101,9 @@ img {
   right: 1.8em;
   top: -1.3em;
   color: white;
+}
+
+.donated {
+  filter: grayscale(100%);
 }
 </style>

@@ -2,6 +2,7 @@ import Vue from "vue"
 import Vuex from "vuex"
 
 import regex from '../utils/regex'
+import items from '../utils/items.json'
 
 Vue.use(Vuex)
 
@@ -23,7 +24,8 @@ export default new Vuex.Store({
       potion: false,
       bag: false,
       mount: false,
-      cape: false
+      cape: false,
+      donated: true
     }
   },
   mutations: {
@@ -66,12 +68,51 @@ export default new Vuex.Store({
       state.selectedPlayersLogs.push(selectedPlayers)
     },
     addChestLogs(state, logs) {
-      state.chestLogs.push(logs)
+      const donations = []
+
+      for (const line of logs) {
+        const result = regex.chestLogRe.exec(line)
+
+        if (result == null) {
+          continue
+        }
+
+        const donatedAt = result[1]
+        const donatedBy = result[2]
+        const itemName = result[3]
+        const itemEnchant = parseInt(result[4], 10)
+        const amount = parseInt(result[5], 10)
+
+        let itemId = items[itemName]
+
+        if (itemEnchant > 0) {
+          itemId = `${itemId}@${itemEnchant}`
+        }
+
+        if (amount > 0) {
+          donations.push({ donatedAt, donatedBy, itemId, itemEnchant, amount })
+        }
+      }
+
+      state.chestLogs.push(donations)
     }
   },
   actions: {},
   modules: {},
   getters: {
+    donatedLoot(state) {
+      const donatedLoot = {}
+
+      for (const logs of state.chestLogs) {
+        for (const line of logs) {
+          const key = `${line.donatedBy} ${line.donatedAt} ${line.itemId} ${line.amount}`
+
+          donatedLoot[key] = line
+        }
+      }
+
+      return Object.values(donatedLoot)
+    },
     allPlayers(state) {
       const allPlayers = new Set()
 

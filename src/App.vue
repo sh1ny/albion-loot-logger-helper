@@ -49,20 +49,21 @@ export default {
       let result = regex.lootLogRe.exec(head)
 
       if (result) {
-        return this.processLoot(lines)
-      }
-
-      result = regex.guildMemberLogRe.exec(head)
-
-      if (result) {
-        return this.processGuildMembers(lines)
+        return this.processLoot(lines.slice(1))
       }
 
       result = regex.chestLogRe.exec(head)
 
       if (result) {
-        return this.processChestLog(lines)
+        return this.processChestLog(lines.slice(1))
       }
+
+      result = regex.guildMemberLogRe.exec(head)
+
+      if (result) {
+        return this.processGuildMembers(lines.slice(1))
+      }
+
     },
     processLoot(lines) {
       this.$store.commit('addLootLogs', lines)

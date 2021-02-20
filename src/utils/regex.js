@@ -1,6 +1,6 @@
 const guildMemberLogRe = /".*"\t"(.*)"\t".*"\t".*"/
 const lootLogRe = /(.*);(.*);(.*);(.*);(.*)/
-const chestLogRe = /asd/
+const chestLogRe = /"(.*)"\t"(.*)"\t"(.*)"\t"(.*)"\t".*"\t"(.*)"/
 
 export default {
   guildMemberLogRe,
