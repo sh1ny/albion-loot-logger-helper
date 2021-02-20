@@ -134,6 +134,10 @@ export default new Vuex.Store({
       return Object.freeze(sortedUniquePlayers)
     },
     selectedPlayers(state) {
+      if (!state.selectedPlayersLogs.length) {
+        return null
+      }
+
       const selectedPlayers = {}
 
       for (const logs of state.selectedPlayersLogs) {
@@ -145,7 +149,7 @@ export default new Vuex.Store({
       return Object.freeze(selectedPlayers)
     },
     filteredPlayers(state, getters) {
-      if (!getters.selectedPlayers.length) {
+      if (!getters.selectedPlayers) {
         return getters.allPlayers
       }
 
