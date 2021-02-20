@@ -122,7 +122,7 @@ export default new Vuex.Store({
         }
       }
 
-      return Array.from(allPlayers)
+      return Array.from(allPlayers).sort((a, b) => a.localeCompare(b))
     },
     selectedPlayers(state) {
       const selectedPlayers = new Set()

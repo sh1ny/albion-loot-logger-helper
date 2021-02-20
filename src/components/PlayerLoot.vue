@@ -1,7 +1,7 @@
 <template>
-  <li v-show="hasItems">
-    <div class="player-name">{{ playerName }}</div>
-    <div class="items">
+  <tr v-show="hasItems">
+    <td class="player-name">{{ playerName }}</td>
+    <td class="items">
       <Item
         v-for="(details, itemId) in filteredItems"
         :key="itemId"
@@ -9,8 +9,8 @@
         :details="details"
         :donations="donations"
       />
-    </div>
-  </li>
+    </td>
+  </tr>
 </template>
 
 <script>
@@ -39,7 +39,7 @@ export default {
       'donatedLoot'
     ]),
     filteredItems() {
-      if (!this.filters.donated) {
+      if (this.filters.donated) {
         return this.items
       }
 
@@ -140,4 +140,12 @@ export default {
 </script>
 
 <style scoped>
+.player-name {
+  text-align: center;
+  min-width: 200px;
+}
+
+.items {
+  padding-top: 8px;
+}
 </style>

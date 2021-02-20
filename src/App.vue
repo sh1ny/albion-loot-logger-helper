@@ -1,13 +1,18 @@
 <template>
   <div class="home" @drop.prevent="drop" @dragover.prevent>
-    <div>
-      <Filters/>
-    </div>
-    <div>
-      <ul>
-        <PlayerLoot v-for="player in filteredPlayers" :key="player" :player-name="player"/>
-      </ul>
-    </div>
+    <Filters/>
+    
+    <table id="loot-table">
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Items</th>
+        </tr>
+      </thead>
+      <tbody>
+        <PlayerLoot v-for="playerName in filteredPlayers" :key="playerName" :player-name="playerName"/>
+      </tbody>
+    </table>
   </div>
 </template>
 
@@ -86,9 +91,33 @@ export default {
 </script>
 
 <style>
-html,
-body,
-.home {
+html, body, .home {
   height: 100%;
+  width: 100%;
+}
+
+.home {
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+}
+
+#loot-table {
+  width: 80%;
+  max-width: 1280px;
+}
+
+table {
+  border-collapse: collapse;
+  border-spacing: 0px;
+}
+
+th, td {
+  border: 1px solid #CCCCCC;
+  box-sizing: border-box;
+}
+
+th {
+  padding: 8px;
 }
 </style>

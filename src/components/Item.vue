@@ -6,6 +6,8 @@
 </template>
 
 <script>
+import itemsIdToName from '../utils/items-id-to-name.json'
+
 export default {
   props: {
     itemId: {
@@ -23,14 +25,15 @@ export default {
   },
   computed: {
     url() {
-      return `https://render.albiononline.com/v1/item/${this.itemId}.png?count=1&quality=1&size=217`
+      return `https://render.albiononline.com/v1/item/${this.itemId}.png?count=1&quality=1&size=210`
     },
     title() {
       const items = this.details.history
-        .map(e => `Looted ${e.amount}x from ${e.lootedFrom} at ${e.lootedAt.format('DD-MM-YYYY hh:mm:ss')}`)
+        .map(e => `${e.amount}x looted from ${e.lootedFrom} at ${e.lootedAt.format('DD-MM-YYYY hh:mm:ss')}`)
 
       return [
-        this.itemId,
+        itemsIdToName[this.itemId],
+        '',
         ...items
       ].join('\n')
     },
