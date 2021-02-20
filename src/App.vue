@@ -1,8 +1,13 @@
 <template>
   <div class="home" @drop.prevent="drop" @dragover.prevent>
-    <ul>
-      <PlayerLoot v-for="player in filteredPlayers" :key="player" :player-name="player"/>
-    </ul>
+    <div>
+      <Filters/>
+    </div>
+    <div>
+      <ul>
+        <PlayerLoot v-for="player in filteredPlayers" :key="player" :player-name="player"/>
+      </ul>
+    </div>
   </div>
 </template>
 
@@ -10,11 +15,13 @@
 import { mapGetters } from 'vuex'
 
 import PlayerLoot from './components/PlayerLoot.vue'
+import Filters from './components/Filters.vue'
 import regex from './utils/regex'
 
 export default {
   components: {
-    PlayerLoot
+    PlayerLoot,
+    Filters
   },
   computed: {
     ...mapGetters([
