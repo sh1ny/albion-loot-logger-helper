@@ -326,6 +326,8 @@ export default new Vuex.Store({
         filterPatterns.push(/_JOURNAL_/)
         filterPatterns.push(/_SKILLBOOK/)
         filterPatterns.push(/_SEAWEED/)
+        filterPatterns.push(/QUESTITEM_EXP_TOKEN/)
+        filterPatterns.push(/_VANITY_/)
 
         filterPatterns.push(/T\d_ROCK/)
         filterPatterns.push(/T\d_STONEBLOCK/)
