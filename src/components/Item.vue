@@ -1,6 +1,6 @@
 <template>
   <div class="item" :class="{ donated: donatedAll }">
-    <img :src="url" :alt="title" :title="title" />
+    <img :src="url" :alt="itemId" :title="title" />
     <span class="amount">{{ amount }}</span>
   </div>
 </template>
@@ -32,7 +32,7 @@ export default {
         .map(e => `${e.amount}x looted from ${e.lootedFrom} at ${e.lootedAt.format('DD-MM-YYYY hh:mm:ss')}`)
 
       return [
-        itemsIdToName[this.itemId],
+        `${itemsIdToName[this.itemId]} - ${this.itemId}`,
         '',
         ...items
       ].join('\n')

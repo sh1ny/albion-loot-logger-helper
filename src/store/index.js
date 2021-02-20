@@ -20,13 +20,14 @@ export default new Vuex.Store({
       t6: true,
       t7: true,
       t8: true,
-      trash: false,
-      food: false,
-      potion: false,
       bag: false,
-      mount: false,
       cape: false,
-      donated: false
+      donated: false,
+      food: false,
+      mount: false,
+      others: false,
+      potion: false,
+      trash: false,
     }
   },
   mutations: {
@@ -46,10 +47,12 @@ export default new Vuex.Store({
         const amount = parseInt(result[4], 10)
         const lootedFrom = result[5]
 
-        loot.push({ lootedAt, lootedBy, itemId, amount, lootedFrom })
+        const log = { lootedAt, lootedBy, itemId, amount, lootedFrom }
+
+        loot.push(Object.freeze(log))
       }
 
-      state.lootLogs.push(loot)
+      state.lootLogs.push(Object.freeze(loot))
     },
     addSelectedPlayersLogs(state, logs) {
       const selectedPlayers = []
@@ -63,10 +66,12 @@ export default new Vuex.Store({
 
         const playerName = result[1]
 
-        selectedPlayers.push({ playerName })
+        const player = { playerName }
+
+        selectedPlayers.push(Object.freeze(player))
       }
 
-      state.selectedPlayersLogs.push(selectedPlayers)
+      state.selectedPlayersLogs.push(Object.freeze(selectedPlayers))
     },
     addChestLogs(state, logs) {
       const donations = []
@@ -91,15 +96,15 @@ export default new Vuex.Store({
         }
 
         if (amount > 0) {
-          donations.push({ donatedAt, donatedBy, itemId, itemEnchant, amount })
+          const log = { donatedAt, donatedBy, itemId, itemEnchant, amount }
+
+          donations.push(Object.freeze(log))
         }
       }
 
-      state.chestLogs.push(donations)
+      state.chestLogs.push(Object.freeze(donations))
     }
   },
-  actions: {},
-  modules: {},
   getters: {
     donatedLoot(state) {
       const donatedLoot = {}
@@ -124,6 +129,8 @@ export default new Vuex.Store({
       }
 
       return Array.from(allPlayers)
+        .sort((a, b) => a.localeCompare(b))
+        .map(Object.freeze)
     },
     selectedPlayers(state) {
       const selectedPlayers = new Set()
@@ -143,25 +150,23 @@ export default new Vuex.Store({
 
       return getters.allPlayers.filter(player => getters.selectedPlayers.includes(player))
     },
-    totalLootedByPlayer(state, getters) {
-      const totalLooted = {}
+    // totalLootedByPlayer(state, getters) {
+    //   const totalLooted = {}
 
-      for (const log of getters.filteredLoot) {
-        totalLooted[log.lootedBy] = (totalLooted[log.lootedBy] || 0) + log.amount
-      }
+    //   for (const log of getters.filteredLoot) {
+    //     totalLooted[log.lootedBy] = (totalLooted[log.lootedBy] || 0) + log.amount
+    //   }
 
-      return totalLooted
-    },
-    sortedFilteredPlayers(state, getters) {
-      return getters.filteredPlayers
-        .slice()
-        .sort((p1, p2) => (getters.totalLootedByPlayer[p2] || 0) - (getters.totalLootedByPlayer[p1] || 0))
-    },
+    //   return totalLooted
+    // },
+    // sortedFilteredPlayers(state, getters) {
+    //   return getters.filteredPlayers
+    //     .slice()
+    //     .sort((p1, p2) => (getters.totalLootedByPlayer[p2] || 0) - (getters.totalLootedByPlayer[p1] || 0))
+    // },
     allLoot(state) {
       const loot = []
       
-      console.log('allLoot')
-
       for (const logs of state.lootLogs) {
         for (const log of logs) {
           const isDuplicate = loot.some(e => {
@@ -184,8 +189,6 @@ export default new Vuex.Store({
             // probably a duplicate
             return diff <= 5000
           })
-
-          console.log(isDuplicate, log.lootedBy, log.lootedFrom, log.itemId)
 
           if (!isDuplicate) {
             loot.push(log)
@@ -247,6 +250,8 @@ export default new Vuex.Store({
 
       if (!state.filters.food) {
         filterPatterns.push(/_MEAL_/)
+        filterPatterns.push(/_FISH_SALTWATER_/)
+        filterPatterns.push(/_FISH_FRESHWATER_/)
       }
 
       if (!state.filters.cape) {
@@ -298,13 +303,31 @@ export default new Vuex.Store({
       }
 
       if (!state.filters.others) {
-        filterPatterns.push(/RUNE/)
-        filterPatterns.push(/SOUL/)
-        filterPatterns.push(/RELIC/)
+        filterPatterns.push(/_ARTEFACT_/)
+
+        filterPatterns.push(/_RUNE/)
+        filterPatterns.push(/_SOUL/)
+        filterPatterns.push(/_RELIC/)
+
         filterPatterns.push(/_FARM/)
         filterPatterns.push(/_TOOL_/)
         filterPatterns.push(/_GVGTOKEN_/)
         filterPatterns.push(/TREASURE/)
+        filterPatterns.push(/FURNITUREITEM/)
+        filterPatterns.push(/_JOURNAL_/)
+        filterPatterns.push(/_SKILLBOOK/)
+        filterPatterns.push(/_SEAWEED/)
+
+        filterPatterns.push(/T\d_ROCK/)
+        filterPatterns.push(/T\d_STONEBLOCK/)
+        filterPatterns.push(/T\d_FIBER/)
+        filterPatterns.push(/T\d_CLOTH/)
+        filterPatterns.push(/T\d_ORE/)
+        filterPatterns.push(/T\d_METALBAR/)
+        filterPatterns.push(/T\d_WOOD/)
+        filterPatterns.push(/T\d_PLANKS/)
+        filterPatterns.push(/T\d_HIDE/)
+        filterPatterns.push(/T\d_LEATHER/)
       }
 
       return filterPatterns
