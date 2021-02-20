@@ -25,7 +25,7 @@ export default new Vuex.Store({
       bag: false,
       mount: false,
       cape: false,
-      donated: true
+      donated: false
     }
   },
   mutations: {
