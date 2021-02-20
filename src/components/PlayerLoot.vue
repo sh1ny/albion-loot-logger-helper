@@ -118,7 +118,7 @@ export default {
 <style scoped>
 .player-name {
   text-align: center;
-  min-width: 200px;
+  width: 200px;
   vertical-align: middle;
 }
 
