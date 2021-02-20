@@ -117,38 +117,41 @@ export default new Vuex.Store({
         }
       }
 
-      return Object.values(donatedLoot)
+      return Object.freeze(Object.values(donatedLoot))
     },
     allPlayers(state) {
       const allPlayers = new Set()
 
       for (const logs of state.lootLogs) {
         for (const item of logs) {
-          allPlayers.add(item.lootedBy)
+          allPlayers.add(Object.freeze(item.lootedBy))
         }
       }
 
-      return Array.from(allPlayers)
-        .sort((a, b) => a.localeCompare(b))
-        .map(Object.freeze)
+      const uniquePlayers = Array.from(allPlayers)
+      const sortedUniquePlayers = uniquePlayers.sort((a, b) => a.localeCompare(b))
+
+      return Object.freeze(sortedUniquePlayers)
     },
     selectedPlayers(state) {
-      const selectedPlayers = new Set()
+      const selectedPlayers = {}
 
       for (const logs of state.selectedPlayersLogs) {
         for (const item of logs) {
-          selectedPlayers.add(item.playerName)
+          selectedPlayers[item.playerName] = true
         }
       }
 
-      return Array.from(selectedPlayers)
+      return Object.freeze(selectedPlayers)
     },
     filteredPlayers(state, getters) {
       if (!getters.selectedPlayers.length) {
         return getters.allPlayers
       }
 
-      return getters.allPlayers.filter(player => getters.selectedPlayers.includes(player))
+      const filteredPlayers = getters.allPlayers.filter(player => getters.selectedPlayers[player])
+
+      return Object.freeze(filteredPlayers)
     },
     // totalLootedByPlayer(state, getters) {
     //   const totalLooted = {}
@@ -166,7 +169,7 @@ export default new Vuex.Store({
     // },
     allLoot(state) {
       const loot = []
-      
+
       for (const logs of state.lootLogs) {
         for (const log of logs) {
           const isDuplicate = loot.some(e => {
@@ -196,14 +199,16 @@ export default new Vuex.Store({
         }
       }
 
-      return loot
+      return Object.freeze(loot)
     },
     filteredLoot(state, getters) {
-      return getters.allLoot.filter(loot => {
+      const filteredLoot = getters.allLoot.filter(loot => {
         const hideItem = getters.filterPatterns.some(pattern => loot.itemId.match(pattern))
 
         return !hideItem
       })
+
+      return Object.freeze(filteredLoot)
     },
     filterPatterns(state) {
       const filterPatterns = []
@@ -330,7 +335,7 @@ export default new Vuex.Store({
         filterPatterns.push(/T\d_LEATHER/)
       }
 
-      return filterPatterns
+      return Object.freeze(filterPatterns.map(Object.freeze))
     }
   }
 })
