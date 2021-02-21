@@ -251,6 +251,7 @@ export default new Vuex.Store({
 
       if (!state.filters.bag) {
         filterPatterns.push(/_BAG/)
+        filterPatterns.push(/_BAG_INSIGHT/)
       }
 
       if (!state.filters.potion) {
