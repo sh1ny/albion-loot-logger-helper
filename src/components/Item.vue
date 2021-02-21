@@ -30,7 +30,7 @@ export default {
   },
   computed: {
     url() {
-      return encodeURIComponent(`${this.publicPath}items/${this.itemId}#1.png`)
+      return `${this.publicPath}items/${this.itemId}%231.png`
     },
     title() {
       const items = this.details.history
