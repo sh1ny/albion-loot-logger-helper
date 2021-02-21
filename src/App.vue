@@ -4,7 +4,7 @@
 
     <Filters/>
     
-    <table id="loot-table" class="table table-bordered" v-if="filteredPlayers.length">
+    <table id="loot-table" class="table table-bordered" v-if="slices.length">
       <thead>
         <tr>
           <th>Name</th>
@@ -12,7 +12,7 @@
         </tr>
       </thead>
       <tbody v-for="(slice, index) in slices" :key="index">
-        <PlayerLoot v-for="playerName in slice" :key="playerName" :player-name="playerName"/>
+        <PlayerLoot v-for="player in slice" :key="player.name" :name="player.name" :amount="player.amountOfPickedUpItems" :items="player.items"/>
       </tbody>
     </table>
   </div>
@@ -35,12 +35,29 @@ export default {
     ...mapGetters([
       'filteredPlayers'
     ]),
+    sortedFilteredPlayers() {
+      const sortedFilteredPlayers = {}
+
+      const sortedByAmountOfPickedUpItems = Object.values(this.filteredPlayers)
+        .sort((a, b) => Object.keys(b.items).length - Object.keys(a.items).length)
+
+      for (const player of sortedByAmountOfPickedUpItems) {
+        sortedFilteredPlayers[player.name] = player
+      }
+
+      return sortedFilteredPlayers
+    },
     slices() {
       const slices = []
-      const SLICE_SIZE = 20
+      const SLICE_SIZE = 10
 
-      for (let i = 0; i < this.filteredPlayers.length; i += SLICE_SIZE) {
-        slices.push(this.filteredPlayers.slice(i, i + SLICE_SIZE))
+      const players = Object.keys(this.sortedFilteredPlayers)
+
+      for (let i = 0; i < players.length; i += SLICE_SIZE) {
+        const slice = players.slice(i, i + SLICE_SIZE)
+          .map(item => this.filteredPlayers[item])
+
+        slices.push(slice)
       }
 
       return slices

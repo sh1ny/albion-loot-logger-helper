@@ -3,6 +3,7 @@ import Vuex from "vuex"
 import moment from 'moment'
 
 import regex from '../utils/regex'
+import deepFreeze from '../utils/deepFreeze'
 import items from '../utils/items.json'
 
 Vue.use(Vuex)
@@ -49,10 +50,10 @@ export default new Vuex.Store({
 
         const log = { lootedAt, lootedBy, itemId, amount, lootedFrom }
 
-        loot.push(Object.freeze(log))
+        loot.push(log)
       }
 
-      state.lootLogs.push(Object.freeze(loot))
+      state.lootLogs.push(deepFreeze(loot))
     },
     addSelectedPlayersLogs(state, logs) {
       const selectedPlayers = []
@@ -68,10 +69,10 @@ export default new Vuex.Store({
 
         const player = { playerName }
 
-        selectedPlayers.push(Object.freeze(player))
+        selectedPlayers.push(player)
       }
 
-      state.selectedPlayersLogs.push(Object.freeze(selectedPlayers))
+      state.selectedPlayersLogs.push(deepFreeze(selectedPlayers))
     },
     addChestLogs(state, logs) {
       const donations = []
@@ -98,11 +99,11 @@ export default new Vuex.Store({
         if (amount > 0) {
           const log = { donatedAt, donatedBy, itemId, itemEnchant, amount }
 
-          donations.push(Object.freeze(log))
+          donations.push(log)
         }
       }
 
-      state.chestLogs.push(Object.freeze(donations))
+      state.chestLogs.push(deepFreeze(donations))
     }
   },
   getters: {
@@ -117,60 +118,108 @@ export default new Vuex.Store({
         }
       }
 
-      return Object.freeze(Object.values(donatedLoot))
+      return deepFreeze(Object.values(donatedLoot))
     },
-    allPlayers(state) {
-      const allPlayers = new Set()
+    allPlayers(state, getters) {
+      const players = {}
 
-      for (const logs of state.lootLogs) {
-        for (const item of logs) {
-          allPlayers.add(Object.freeze(item.lootedBy))
+      for (const loot of getters.filteredLoot) {
+        if (players[loot.lootedBy] == null) {
+          players[loot.lootedBy] = {
+            name: loot.lootedBy,
+            amountOfPickedUpItems: 0,
+            items: {}
+          }
+        }
+
+        if (players[loot.lootedBy].items[loot.itemId] == null) {
+          players[loot.lootedBy].items[loot.itemId] = {
+            id: loot.itemId,
+            amount: 0,
+            donatedAll: false,
+            history: []
+          }
+        }
+
+        players[loot.lootedBy].amountOfPickedUpItems += loot.amount
+
+        players[loot.lootedBy].items[loot.itemId].amount += loot.amount
+        players[loot.lootedBy].items[loot.itemId].history.push(loot)
+      }
+
+      for (const player in players) {
+        // if the user didn't donate anything, skip it.
+        if (getters.donationsByPlayer[player] == null) {
+          continue
+        }
+
+        for (const itemId in getters.donationsByPlayer[player]) {
+          if (players[player].items[itemId] == null) {
+            continue
+          }
+
+          const donation = getters.donationsByPlayer[player][itemId]
+
+          if (donation.amount >= players[player].items[itemId].amount) {
+            if (!state.filters.donated) {
+              delete players[player].items[itemId]
+            } else {
+              players[player].items[itemId].donatedAll = true
+            }
+          } else {
+            players[player].items[itemId].amount -= donation.amount
+          }
+
+          players[player].amountOfPickedUpItems -= donation.amount
+        }
+
+        if (players[player].amountOfPickedUpItems <= 0) {
+          delete players[player]
         }
       }
 
-      const uniquePlayers = Array.from(allPlayers)
-      const sortedUniquePlayers = uniquePlayers.sort((a, b) => a.localeCompare(b))
+      // for (const player in players) {
+      //   for (const itemId in players[player].items) {
+      //     players[player].items[itemId] = Object.freeze(players[player].items[itemId])
+      //   }
 
-      return Object.freeze(sortedUniquePlayers)
+      //   players[player].items = Object.freeze(players[player].items)
+
+      //   players[player] = Object.freeze(players[player])
+      // }
+
+      return deepFreeze(players)
     },
     selectedPlayers(state) {
       if (!state.selectedPlayersLogs.length) {
         return null
       }
 
-      const selectedPlayers = {}
+      const selectedPlayers = new Set()
 
       for (const logs of state.selectedPlayersLogs) {
         for (const item of logs) {
-          selectedPlayers[item.playerName] = true
+          selectedPlayers.add(item.playerName)
         }
       }
 
-      return Object.freeze(selectedPlayers)
+      return Array.from(selectedPlayers)
     },
     filteredPlayers(state, getters) {
       if (!getters.selectedPlayers) {
         return getters.allPlayers
       }
 
-      const filteredPlayers = getters.allPlayers.filter(player => getters.selectedPlayers[player])
+      const players = {}
 
-      return Object.freeze(filteredPlayers)
+      for (const player of getters.selectedPlayers) {
+        if (getters.allPlayers[player]) {
+          players[player] = getters.allPlayers[player]
+        }
+      }
+
+      return players
     },
-    // totalLootedByPlayer(state, getters) {
-    //   const totalLooted = {}
-
-    //   for (const log of getters.filteredLoot) {
-    //     totalLooted[log.lootedBy] = (totalLooted[log.lootedBy] || 0) + log.amount
-    //   }
-
-    //   return totalLooted
-    // },
-    // sortedFilteredPlayers(state, getters) {
-    //   return getters.filteredPlayers
-    //     .slice()
-    //     .sort((p1, p2) => (getters.totalLootedByPlayer[p2] || 0) - (getters.totalLootedByPlayer[p1] || 0))
-    // },
     allLoot(state) {
       const loot = []
 
@@ -203,7 +252,7 @@ export default new Vuex.Store({
         }
       }
 
-      return Object.freeze(loot)
+      return deepFreeze(loot)
     },
     filteredLoot(state, getters) {
       const filteredLoot = getters.allLoot.filter(loot => {
@@ -212,7 +261,7 @@ export default new Vuex.Store({
         return !hideItem
       })
 
-      return Object.freeze(filteredLoot)
+      return deepFreeze(filteredLoot)
     },
     filterPatterns(state) {
       const filterPatterns = []
@@ -342,7 +391,36 @@ export default new Vuex.Store({
         filterPatterns.push(/T\d_LEATHER/)
       }
 
-      return Object.freeze(filterPatterns.map(Object.freeze))
+      return deepFreeze(filterPatterns)
+    },
+    donationsByPlayer(state, getters) {
+      const donationsByPlayer = {}
+
+      for (const donation of getters.donatedLoot) {
+        if (donationsByPlayer[donation.donatedBy] == null) {
+          donationsByPlayer[donation.donatedBy] = {}
+        }
+        
+        if (donationsByPlayer[donation.donatedBy][donation.itemId] == null) {
+          donationsByPlayer[donation.donatedBy][donation.itemId] = {
+            amount: 0,
+            history: []
+          }
+        }
+
+        donationsByPlayer[donation.donatedBy][donation.itemId].amount += donation.amount
+        donationsByPlayer[donation.donatedBy][donation.itemId].history.push(donation)
+      }
+
+      // for (const player in donationsByPlayer) {
+      //   const donations = donationsByPlayer[player]
+        
+      //   donations.history = Object.freeze(donations.history)
+
+      //   donationsByPlayer[player] = Object.freeze(donationsByPlayer[player])
+      // }
+
+      return deepFreeze(donationsByPlayer)
     }
   }
 })

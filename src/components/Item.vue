@@ -1,6 +1,6 @@
 <template>
   <div class="item" :class="{ donated: donatedAll }">
-    <img :src="url" :alt="itemId" :title="title" />
+    <img :src="url" :alt="id" :title="title" />
     <span class="amount">{{ amount }}</span>
   </div>
 </template>
@@ -16,56 +16,36 @@ export default {
     }
   },
   props: {
-    itemId: {
+    id: {
       type: String,
       required: true
     },
-    details: {
-      type: Object,
+    history: {
+      type: Array,
       required: true
     },
-    donations: {
-      type: Object,
-      required: true
+    donatedAll: {
+      type: Boolean,
+      default: () => false
+    },
+    amount: {
+      type: Number,
+      default: () => 1
     }
   },
   computed: {
     url() {
-      return `${this.publicPath}items/${this.itemId}%231.png`
+      return `${this.publicPath}items/${this.id}%231.png`
     },
     title() {
-      const items = this.details.history
+      const items = this.history
         .map(e => `${e.amount}x looted from ${e.lootedFrom} at ${e.lootedAt.format('DD-MM-YYYY hh:mm:ss')}`)
 
       return [
-        `${itemsIdToName[this.itemId]} - ${this.itemId}`,
+        `${itemsIdToName[this.id]} - ${this.id}`,
         '',
         ...items
       ].join('\n')
-    },
-    donatedAmount() {
-      let amount = 0
-
-      for (const donation of this.filteredDonations) {
-        amount += donation.amount
-      }
-
-      return amount
-    },
-    donatedAll() {
-      return this.donatedAmount >= this.amount
-    },
-    filteredDonations() {
-      return this.donations[this.itemId] || []
-    },
-    amount() {
-      let amount = 0
-
-      for (const item of this.details.history) {
-        amount += item.amount
-      }
-
-      return amount
     }
   }
 }
