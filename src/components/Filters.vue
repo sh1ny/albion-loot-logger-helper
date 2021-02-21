@@ -38,7 +38,7 @@ export default {
 .filters {
   display: grid;
   grid-gap: 1em;
-  grid-template-columns: repeat(auto-fit, minmax(70px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(50px, 1fr));
   width: 100%;
   text-align: center;
 }
@@ -55,10 +55,11 @@ export default {
 
 .filter-name {
   text-transform: capitalize;
+  font-size: 0.8em;
 }
 
 svg {
-  width: 20px;
+  width: 16px;
   margin-left: 4px;
   margin-bottom: 4px;
   cursor: pointer;
@@ -69,7 +70,7 @@ svg.eye {
 }
 
 svg.eye-slash {
-  color: #cccccc;
+  color: #808080;
 }
 
 button {

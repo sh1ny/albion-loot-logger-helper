@@ -9,6 +9,11 @@
 import itemsIdToName from '../utils/items-id-to-name.json'
 
 export default {
+  data () {
+    return {
+      publicPath: process.env.BASE_URL
+    }
+  },
   props: {
     itemId: {
       type: String,
@@ -25,7 +30,7 @@ export default {
   },
   computed: {
     url() {
-      return `https://render.albiononline.com/v1/item/${this.itemId}.png?count=1&quality=1&size=210`
+      return encodeURIComponent(`${this.publicPath}items/${this.itemId}#1.png`)
     },
     title() {
       const items = this.details.history
