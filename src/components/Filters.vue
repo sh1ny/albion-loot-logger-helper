@@ -22,8 +22,9 @@
 
 <script>
 import { mapState } from 'vuex'
-import html2canvas from 'html2canvas'
-import { saveAs } from 'file-saver'
+
+let html2canvas = null
+let saveAs = null
 
 export default {
   data() {
@@ -44,14 +45,48 @@ export default {
 
       this.downloading = true
 
-      const table = document.querySelector("table#loot-table")
-      const canvas = await html2canvas(table)
+      if (html2canvas == null) {
+        const lib = await import('html2canvas')
 
-      canvas.toBlob(blob => {
-        saveAs(blob, 'loot.png')
+        html2canvas = window.html2canvas = lib.default
+      }
 
-        this.downloading = false
-      })
+      if (saveAs == null) {
+        const fileSaver = await import('file-saver')
+
+        saveAs = fileSaver.saveAs
+      }
+
+      const images = await this.getImages()
+
+      const date = new Date().toISOString()
+
+      for (let i = 0; i < images.length; i++) {
+        const blob = images[i]
+
+        saveAs(blob, `albion-loot-${date}-${i}.png`)
+      }
+
+      this.downloading = false
+    },
+    async getImages() {
+      const groups = [...document.querySelectorAll('table#loot-table tbody')]
+
+      const promises = []
+
+      for (const group of groups) {
+        const canvas = await html2canvas(group, { logging: false })
+
+        const promise = new Promise((resolve) => {
+          canvas.toBlob(blob => {
+            return resolve(blob)
+          })
+        })
+
+        promises.push(promise)
+      }
+
+      return Promise.all(promises)
     }
   }
 }

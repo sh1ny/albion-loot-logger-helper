@@ -1,5 +1,5 @@
 <template>
-  <tr v-show="hasItems">
+  <tr v-if="hasItems">
     <td class="player-name">{{ playerName }}</td>
     <td class="items">
       <Item
@@ -20,6 +20,7 @@ import _ from 'lodash'
 import Item from './Item.vue'
 
 export default {
+  name: 'PlayerLoot',
   components: {
     Item
   },

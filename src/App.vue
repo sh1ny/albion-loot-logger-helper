@@ -11,8 +11,8 @@
           <th>Items</th>
         </tr>
       </thead>
-      <tbody>
-        <PlayerLoot v-for="playerName in filteredPlayers" :key="playerName" :player-name="playerName"/>
+      <tbody v-for="(slice, index) in slices" :key="index">
+        <PlayerLoot v-for="playerName in slice" :key="playerName" :player-name="playerName"/>
       </tbody>
     </table>
   </div>
@@ -26,6 +26,7 @@ import Filters from './components/Filters.vue'
 import regex from './utils/regex'
 
 export default {
+  name: 'App',
   components: {
     PlayerLoot,
     Filters
@@ -33,7 +34,17 @@ export default {
   computed: {
     ...mapGetters([
       'filteredPlayers'
-    ])
+    ]),
+    slices() {
+      const slices = []
+      const SLICE_SIZE = 20
+
+      for (let i = 0; i < this.filteredPlayers.length; i += SLICE_SIZE) {
+        slices.push(this.filteredPlayers.slice(i, i + SLICE_SIZE))
+      }
+
+      return slices
+    }
   },
   methods: {
     drop(event) {

@@ -9,6 +9,7 @@
 import itemsIdToName from '../utils/items-id-to-name.json'
 
 export default {
+  name: 'Item',
   data () {
     return {
       publicPath: process.env.BASE_URL
