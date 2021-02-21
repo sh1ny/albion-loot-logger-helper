@@ -1,7 +1,7 @@
 <template>
   <div class="item" :class="{ donated: donatedAll }">
     <img :src="url" :alt="id" :title="title" />
-    <span class="amount">{{ amount }}</span>
+    <div class="amount">{{ amount }}</div>
   </div>
 </template>
 
@@ -53,19 +53,29 @@ export default {
 
 <style scoped>
 .item {
-  display: inline-block;
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-template-rows: 1fr auto;
 }
 
 img {
-  width: 5em;
+  width: 80px;
+  grid-column: 1;
+  grid-row: 1;
 }
 
 .amount {
   font-size: 0.8em;
-  position: relative;
-  right: 1.8em;
-  top: 1.5em;
   color: white;
+  align-self: end;
+  justify-self: end;
+  grid-column:1;
+  grid-row:1;
+  margin-right: 11px;
+  margin-bottom: 10px;
+  font-family: monospaced;
+  width: 20px;
+  text-align: center;
 }
 
 .donated {

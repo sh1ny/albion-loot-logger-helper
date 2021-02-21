@@ -48,5 +48,8 @@ export default {
 
 .items {
   padding-top: 8px;
+  display: grid;
+  grid-gap: 4px;
+  grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
 }
 </style>
