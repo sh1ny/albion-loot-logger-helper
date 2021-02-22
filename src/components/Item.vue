@@ -1,5 +1,5 @@
 <template>
-  <div class="item" :class="{ donated: donatedAll }">
+  <div class="item" :class="{ donated: donatedAll, lost: lostAll }">
     <img :src="url" :alt="id" :title="title" />
     <div class="amount">{{ amount }}</div>
   </div>
@@ -23,6 +23,10 @@ export default {
     history: {
       type: Array,
       required: true
+    },
+    lostAll: {
+      type: Boolean,
+      default: () => false
     },
     donatedAll: {
       type: Boolean,
@@ -79,6 +83,12 @@ img {
 }
 
 .donated {
-  filter: grayscale(100%);
+  /* filter: grayscale(100%); */
+  filter: sepia(100%) saturate(200%) hue-rotate(90deg)
+}
+
+.lost {
+  /* filter: sepia(100%); */
+  filter: sepia(100%) saturate(200%) hue-rotate(-60deg)
 }
 </style>

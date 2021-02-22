@@ -7,6 +7,7 @@
         :key="itemId"
         :id="itemId"
         :donated-all="value.donatedAll"
+        :lost-all="value.lostAll"
         :amount="value.amount"
         :history="value.history"
       />

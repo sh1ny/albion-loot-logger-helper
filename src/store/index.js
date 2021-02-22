@@ -23,6 +23,7 @@ export default new Vuex.Store({
       t8: true,
       bag: false,
       cape: false,
+      lost: true,
       donated: false,
       food: false,
       mount: false,
@@ -128,7 +129,17 @@ export default new Vuex.Store({
           players[loot.lootedBy] = {
             name: loot.lootedBy,
             amountOfPickedUpItems: 0,
-            items: {}
+            items: {},
+            deathItems: {}
+          }
+        }
+
+        if (players[loot.lootedFrom] == null) {
+          players[loot.lootedFrom] = {
+            name: loot.lootedFrom,
+            amountOfPickedUpItems: 0,
+            items: {},
+            deathItems: {}
           }
         }
 
@@ -141,10 +152,22 @@ export default new Vuex.Store({
           }
         }
 
+        if (players[loot.lootedFrom].deathItems[loot.itemId] == null) {
+          players[loot.lootedFrom].deathItems[loot.itemId] = {
+            id: loot.itemId,
+            amount: 0,
+            deathAll: false,
+            history: []
+          }
+        }
+
         players[loot.lootedBy].amountOfPickedUpItems += loot.amount
 
         players[loot.lootedBy].items[loot.itemId].amount += loot.amount
         players[loot.lootedBy].items[loot.itemId].history.push(loot)
+
+        players[loot.lootedFrom].deathItems[loot.itemId].amount += loot.amount
+        players[loot.lootedFrom].deathItems[loot.itemId].history.push(loot)
       }
 
       for (const player in players) {
@@ -178,15 +201,54 @@ export default new Vuex.Store({
         }
       }
 
-      // for (const player in players) {
-      //   for (const itemId in players[player].items) {
-      //     players[player].items[itemId] = Object.freeze(players[player].items[itemId])
-      //   }
+      for (const playerName in players) {
+        const player = players[playerName]
 
-      //   players[player].items = Object.freeze(players[player].items)
+        for (const itemId in player.deathItems) {
+          if (player.items[itemId] == null) {
+            continue
+          }
 
-      //   players[player] = Object.freeze(players[player])
-      // }
+          const item = player.deathItems[itemId]
+
+          if (item.amount >= player.items[itemId].amount) {
+            if (!state.filters.lost) {
+              delete player.items[itemId]
+            } else {
+              player.items[itemId].lostAll = true
+            }
+          } else {
+            player.items[itemId].amount -= item.amount
+          }
+
+          player.amountOfPickedUpItems -= item.amount
+        }
+
+        if (player.amountOfPickedUpItems <= 0) {
+          delete players[playerName]
+        }
+      }
+
+      for (const playerName in players) {
+        const player = players[playerName]
+        const sortedItems = {}
+
+        const sortedKeys = Object.keys(player.items).sort((i1k, i2k) => {
+          const i1 = player.items[i1k]
+          const i2 = player.items[i2k]
+
+          const i1w = i1.lostAll ? 3 : i1.donatedAll ? 2 : 1
+          const i2w = i2.lostAll ? 3 : i2.donatedAll ? 2 : 1
+
+          return i1w - i2w
+        })
+
+        for (const key of sortedKeys) {
+          sortedItems[key] = player.items[key]
+        }
+
+        player.items = sortedItems
+      }
 
       return deepFreeze(players)
     },
@@ -411,14 +473,6 @@ export default new Vuex.Store({
         donationsByPlayer[donation.donatedBy][donation.itemId].amount += donation.amount
         donationsByPlayer[donation.donatedBy][donation.itemId].history.push(donation)
       }
-
-      // for (const player in donationsByPlayer) {
-      //   const donations = donationsByPlayer[player]
-        
-      //   donations.history = Object.freeze(donations.history)
-
-      //   donationsByPlayer[player] = Object.freeze(donationsByPlayer[player])
-      // }
 
       return deepFreeze(donationsByPlayer)
     }
