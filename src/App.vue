@@ -49,14 +49,31 @@ export default {
     },
     slices() {
       const slices = []
-      const SLICE_SIZE = 10
+      const MAX_IMAGES_PER_SLICE = 100
+      const MAX_PLAYERS_IN_SLICE = 8
 
       const players = Object.keys(this.sortedFilteredPlayers)
 
-      for (let i = 0; i < players.length; i += SLICE_SIZE) {
-        const slice = players.slice(i, i + SLICE_SIZE)
-          .map(item => this.filteredPlayers[item])
+      let imagesInSlice = 0
+      let slice = []
 
+      while (players.length) {
+        const playerName = players.shift()
+        const player = this.filteredPlayers[playerName]
+
+        const amountOfDifferentItems = Object.keys(player.items).length
+
+        if (slice.length >= MAX_PLAYERS_IN_SLICE || imagesInSlice + amountOfDifferentItems > MAX_IMAGES_PER_SLICE) {
+          slices.push(slice)
+          imagesInSlice = 0
+          slice = []
+        }
+
+        slice.push(player)
+        imagesInSlice += amountOfDifferentItems
+      }
+
+      if (slice.length) {
         slices.push(slice)
       }
 

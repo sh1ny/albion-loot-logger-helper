@@ -50,6 +50,6 @@ export default {
   padding-top: 8px;
   display: grid;
   grid-gap: 4px;
-  grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+  grid-template-columns: repeat(auto-fit, 80px);
 }
 </style>
