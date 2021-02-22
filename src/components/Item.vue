@@ -71,10 +71,10 @@ img {
   justify-self: end;
   grid-column:1;
   grid-row:1;
-  margin-right: 11px;
+  margin-right: 9px;
   margin-bottom: 10px;
   font-family: monospaced;
-  width: 20px;
+  width: 21px;
   text-align: center;
 }
 
