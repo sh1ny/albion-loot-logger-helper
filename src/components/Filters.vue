@@ -23,7 +23,7 @@
 <script>
 import { mapState } from 'vuex'
 
-let html2canvas = null
+let domToImage = null
 let saveAs = null
 
 export default {
@@ -45,10 +45,10 @@ export default {
 
       this.downloading = true
 
-      if (html2canvas == null) {
-        const lib = await import('html2canvas')
+      if (domToImage == null) {
+        const lib = await import('dom-to-image')
 
-        html2canvas = window.html2canvas = lib.default
+        domToImage = window.domToImage = lib.default
       }
 
       if (saveAs == null) {
@@ -57,12 +57,12 @@ export default {
         saveAs = fileSaver.saveAs
       }
 
-      const images = await this.getImages()
+      const blobs = await this.getImages()
 
       const date = new Date().toISOString()
 
-      for (let i = 0; i < images.length; i++) {
-        const blob = images[i]
+      for (let i = 0; i < blobs.length; i++) {
+        const blob = blobs[i]
 
         saveAs(blob, `albion-loot-${date}-${i}.png`)
       }
@@ -72,21 +72,15 @@ export default {
     async getImages() {
       const groups = [...document.querySelectorAll('table#loot-table tbody')]
 
-      const promises = []
+      const blobs = []
 
       for (const group of groups) {
-        const canvas = await html2canvas(group, { logging: false })
+        const blob = await domToImage.toBlob(group, { bgcolor: '#fff' })
 
-        const promise = new Promise((resolve) => {
-          canvas.toBlob(blob => {
-            return resolve(blob)
-          })
-        })
-
-        promises.push(promise)
+        blobs.push(blob)
       }
 
-      return Promise.all(promises)
+      return blobs
     }
   }
 }
@@ -106,7 +100,7 @@ export default {
 .filters {
   display: grid;
   grid-gap: 1em;
-  grid-template-columns: repeat(auto-fit, minmax(40px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(70px, 1fr));
   width: 100%;
   text-align: center;
 }
