@@ -12,14 +12,23 @@
         </tr>
       </thead>
       <tbody v-for="(slice, index) in slices" :key="index">
-        <PlayerLoot v-for="player in slice" :key="player.name" :name="player.name" :amount="player.amountOfPickedUpItems" :items="player.items"/>
+        <PlayerLoot
+          v-for="player in slice"
+          :key="player.name"
+          :name="player.name"
+          :died="player.died"
+          :picked-up-items="player.pickedUpItems"
+          :resolved-items="filters.resolved ? player.resolvedItems : {}"
+          :lost-items="filters.lost ? player.lostItems : {}" 
+          :donated-items="filters.donated ? player.donatedItems : {}"
+        />
       </tbody>
     </table>
   </div>
 </template>
 
 <script>
-import { mapGetters } from 'vuex'
+import { mapGetters, mapState } from 'vuex'
 
 import PlayerLoot from './components/PlayerLoot.vue'
 import Filters from './components/Filters.vue'
@@ -32,27 +41,23 @@ export default {
     Filters
   },
   computed: {
+    ...mapState([
+      'filters'
+    ]),
     ...mapGetters([
       'filteredPlayers'
     ]),
     sortedFilteredPlayers() {
-      const sortedFilteredPlayers = {}
-
-      const sortedByAmountOfPickedUpItems = Object.values(this.filteredPlayers)
-        .sort((a, b) => Object.keys(b.items).length - Object.keys(a.items).length)
-
-      for (const player of sortedByAmountOfPickedUpItems) {
-        sortedFilteredPlayers[player.name] = player
-      }
-
-      return sortedFilteredPlayers
+      return Object.values(this.filteredPlayers)
+        .sort((a, b) => b.amountOfPickedUpItems - a.amountOfPickedUpItems)
+        .map(p => p.name)
     },
     slices() {
       const slices = []
       const MAX_IMAGES_PER_SLICE = 100
       const MAX_PLAYERS_IN_SLICE = 8
 
-      const players = Object.keys(this.sortedFilteredPlayers)
+      const players = this.sortedFilteredPlayers.slice()
 
       let imagesInSlice = 0
       let slice = []
@@ -61,7 +66,19 @@ export default {
         const playerName = players.shift()
         const player = this.filteredPlayers[playerName]
 
-        const amountOfDifferentItems = Object.keys(player.items).length
+        let amountOfDifferentItems = Object.keys(player.pickedUpItems).length
+
+        if (this.filters.resolved) {
+          amountOfDifferentItems += Object.keys(player.resolvedItems).length
+        }
+
+        if (this.filters.lost) {
+          amountOfDifferentItems += Object.keys(player.lostItems).length
+        }
+
+        if (this.filters.donated) {
+          amountOfDifferentItems += Object.keys(player.donatedItems).length
+        }
 
         if (slice.length >= MAX_PLAYERS_IN_SLICE || imagesInSlice + amountOfDifferentItems > MAX_IMAGES_PER_SLICE) {
           slices.push(slice)

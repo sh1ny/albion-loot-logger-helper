@@ -1,5 +1,5 @@
 <template>
-  <div class="item" :class="{ donated: donatedAll, lost: lostAll }">
+  <div class="item" :class="{ donated: type === 'donation', lost: type === 'lost', resolved: type === 'resolved' }">
     <img :src="url" :alt="id" :title="title" />
     <div class="amount">{{ amount }}</div>
   </div>
@@ -24,13 +24,9 @@ export default {
       type: Array,
       required: true
     },
-    lostAll: {
-      type: Boolean,
-      default: () => false
-    },
-    donatedAll: {
-      type: Boolean,
-      default: () => false
+    type: {
+      type: String,
+      default: () => 'pickedup'
     },
     amount: {
       type: Number,
@@ -42,13 +38,26 @@ export default {
       return `${this.publicPath}items/${this.id}%231.png`
     },
     title() {
-      const items = this.history
-        .map(e => `${e.amount}x looted from ${e.lootedFrom} at ${e.lootedAt.format('DD-MM-YYYY hh:mm:ss')}`)
+      let strs = []
+
+      if (this.type === 'donation') {
+        strs = this.history
+          .map(e => `${e.amount}x donated at ${e.donatedAt.format('DD-MM-YYYY hh:mm:ss')}`)
+      } else if (this.type === 'lost') {
+        strs = this.history
+          .map(e => `${e.amount}x lost to ${e.lootedBy} at ${e.lootedAt.format('DD-MM-YYYY hh:mm:ss')}`)
+      } else if (this.type === 'resolved') {
+        strs = this.history
+          .map(e => `${e.amount}x ${e.str} at ${e.at.format('DD-MM-YYYY hh:mm:ss')}`)
+      } else {
+        strs = this.history
+          .map(e => `${e.amount}x looted from ${e.lootedFrom} at ${e.lootedAt.format('DD-MM-YYYY hh:mm:ss')}`)
+      }
 
       return [
         `${itemsIdToName[this.id]} - ${this.id}`,
         '',
-        ...items
+        ...strs
       ].join('\n')
     }
   }
@@ -83,12 +92,14 @@ img {
 }
 
 .donated {
-  /* filter: grayscale(100%); */
   filter: sepia(100%) saturate(200%) hue-rotate(90deg)
 }
 
 .lost {
-  /* filter: sepia(100%); */
   filter: sepia(100%) saturate(200%) hue-rotate(-60deg)
+}
+
+.resolved {
+  filter: grayscale(100%);
 }
 </style>

@@ -1,15 +1,38 @@
 <template>
   <tr>
-    <td class="player-name">{{ name }}</td>
+    <td class="player-name" :class="{ died: died }">{{ name }}</td>
     <td class="items">
       <Item
-        v-for="(value, itemId) in items"
-        :key="itemId"
+        v-for="(props, itemId) in pickedUpItems"
+        :key="`picked-up-${itemId}`"
         :id="itemId"
-        :donated-all="value.donatedAll"
-        :lost-all="value.lostAll"
-        :amount="value.amount"
-        :history="value.history"
+        :type="'pickedup'"
+        :amount="props.amount"
+        :history="props.history"
+      />
+      <Item
+        v-for="(props, itemId) in resolvedItems"
+        :key="`resolved-${itemId}`"
+        :id="itemId"
+        :type="'resolved'"
+        :amount="props.amount"
+        :history="props.history"
+      />
+      <Item
+        v-for="(props, itemId) in lostItems"
+        :key="`lost-${itemId}`"
+        :id="itemId"
+        :type="'lost'"
+        :amount="props.amount"
+        :history="props.history"
+      />
+      <Item
+        v-for="(props, itemId) in donatedItems"
+        :key="`donated-${itemId}`"
+        :id="itemId"
+        :type="'donation'"
+        :amount="props.amount"
+        :history="props.history"
       />
     </td>
   </tr>
@@ -28,13 +51,25 @@ export default {
       type: String,
       required: true
     },
-    amount: {
-      type: Number,
-      required: true,
-    },
-    items: {
+    pickedUpItems: {
       type: Object,
       required: true
+    },
+    resolvedItems: {
+      type: Object,
+      required: true
+    },
+    lostItems: {
+      type: Object,
+      required: true
+    },
+    donatedItems: {
+      type: Object,
+      required: true
+    },
+    died: {
+      type: Boolean,
+      default: () => false
     }
   }
 }
@@ -45,6 +80,11 @@ export default {
   text-align: center;
   width: 200px;
   vertical-align: middle;
+  font-weight: 600;
+}
+
+.died {
+  color: #cc0000;
 }
 
 .items {

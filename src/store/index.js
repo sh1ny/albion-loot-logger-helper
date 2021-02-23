@@ -23,11 +23,12 @@ export default new Vuex.Store({
       t8: true,
       bag: false,
       cape: false,
-      lost: true,
-      donated: false,
+      lost: false,
+      donated: true,
       food: false,
       mount: false,
       others: false,
+      resolved: true,
       potion: false,
       trash: false,
     }
@@ -43,7 +44,7 @@ export default new Vuex.Store({
           continue
         }
 
-        const lootedAt = moment(result[1], 'DD-MM-YYYY hh:mm:ss')
+        const lootedAt = moment(result[1], 'DD/MM/YYYY hh:mm:ss')
         const lootedBy = result[2]
         const itemId = result[3]
         const amount = parseInt(result[4], 10)
@@ -85,7 +86,7 @@ export default new Vuex.Store({
           continue
         }
 
-        const donatedAt = moment(result[1], 'DD-MM-YYYY hh:mm:ss')
+        const donatedAt = moment(result[1], 'MM/DD/YYYY hh:mm:ss')
         const donatedBy = result[2]
         const itemName = result[3]
         const itemEnchant = parseInt(result[4], 10)
@@ -93,7 +94,7 @@ export default new Vuex.Store({
 
         let itemId = items[itemName]
 
-        if (itemEnchant > 0) {
+        if (itemEnchant > 0 && itemId.indexOf('@') === -1) {
           itemId = `${itemId}@${itemEnchant}`
         }
 
@@ -129,125 +130,141 @@ export default new Vuex.Store({
           players[loot.lootedBy] = {
             name: loot.lootedBy,
             amountOfPickedUpItems: 0,
-            items: {},
-            deathItems: {}
+            pickedUpItems: {},
+            resolvedItems: {},
+            lostItems: {},
+            donatedItems: {}
           }
         }
 
+        if (players[loot.lootedBy].pickedUpItems[loot.itemId] == null) {
+          players[loot.lootedBy].pickedUpItems[loot.itemId] = {
+            id: loot.itemId,
+            amount: 0,
+            history: []
+          }
+        }
+
+        players[loot.lootedBy].amountOfPickedUpItems += 1
+
+        players[loot.lootedBy].pickedUpItems[loot.itemId].amount += loot.amount
+        players[loot.lootedBy].pickedUpItems[loot.itemId].history.push(loot)
+      }
+
+      for (const loot of getters.filteredLoot) {
         if (players[loot.lootedFrom] == null) {
           players[loot.lootedFrom] = {
             name: loot.lootedFrom,
             amountOfPickedUpItems: 0,
-            items: {},
-            deathItems: {}
+            pickedUpItems: {},
+            resolvedItems: {},
+            lostItems: {},
+            donatedItems: {}
           }
         }
 
-        if (players[loot.lootedBy].items[loot.itemId] == null) {
-          players[loot.lootedBy].items[loot.itemId] = {
+        const player = players[loot.lootedFrom]
+
+        player.died = true
+
+        if (player.lostItems[loot.itemId] == null) {
+          player.lostItems[loot.itemId] = {
             id: loot.itemId,
             amount: 0,
-            donatedAll: false,
             history: []
           }
         }
 
-        if (players[loot.lootedFrom].deathItems[loot.itemId] == null) {
-          players[loot.lootedFrom].deathItems[loot.itemId] = {
-            id: loot.itemId,
-            amount: 0,
-            deathAll: false,
-            history: []
-          }
-        }
+        player.lostItems[loot.itemId].amount += loot.amount
+        player.lostItems[loot.itemId].history.push(loot)
 
-        players[loot.lootedBy].amountOfPickedUpItems += loot.amount
-
-        players[loot.lootedBy].items[loot.itemId].amount += loot.amount
-        players[loot.lootedBy].items[loot.itemId].history.push(loot)
-
-        players[loot.lootedFrom].deathItems[loot.itemId].amount += loot.amount
-        players[loot.lootedFrom].deathItems[loot.itemId].history.push(loot)
-      }
-
-      for (const player in players) {
-        // if the user didn't donate anything, skip it.
-        if (getters.donationsByPlayer[player] == null) {
-          continue
-        }
-
-        for (const itemId in getters.donationsByPlayer[player]) {
-          if (players[player].items[itemId] == null) {
-            continue
-          }
-
-          const donation = getters.donationsByPlayer[player][itemId]
-
-          if (donation.amount >= players[player].items[itemId].amount) {
-            if (!state.filters.donated) {
-              delete players[player].items[itemId]
-            } else {
-              players[player].items[itemId].donatedAll = true
+        // if the lost item was picked up, it needs to subtract and create/increment a "resolved" item
+        if (player.pickedUpItems[loot.itemId] != null) {
+          if (player.resolvedItems[loot.itemId] == null) {
+            player.resolvedItems[loot.itemId] = {
+              id: loot.itemId,
+              amount: 0,
+              history: []
             }
-          } else {
-            players[player].items[itemId].amount -= donation.amount
           }
 
-          players[player].amountOfPickedUpItems -= donation.amount
-        }
+          player.resolvedItems[loot.itemId].amount += loot.amount
+          player.resolvedItems[loot.itemId].history.push({
+            amount: loot.amount,
+            at: loot.lootedAt,
+            str: `picked up but lost`
+          })
 
-        if (players[player].amountOfPickedUpItems <= 0) {
-          delete players[player]
+          if (loot.amount >= player.pickedUpItems[loot.itemId].amount) {
+            delete player.pickedUpItems[loot.itemId]
+          } else {
+            player.pickedUpItems[loot.itemId].amount -= loot.amount
+          }
+
+          player.amountOfPickedUpItems -= loot.amount
         }
       }
 
+      for (const donation of getters.filteredDonations) {
+        if (players[donation.donatedBy] == null) {
+          players[donation.donatedBy] = {
+            name: donation.donatedBy,
+            amountOfPickedUpItems: 0,
+            pickedUpItems: {},
+            resolvedItems: {},
+            lostItems: {},
+            donatedItems: {}
+          }
+        }
+
+        const player = players[donation.donatedBy]
+
+        if (player.donatedItems[donation.itemId] == null) {
+          player.donatedItems[donation.itemId] = {
+            id: donation.itemId,
+            amount: 0,
+            history: []
+          }
+        }
+
+        player.donatedItems[donation.itemId].amount += donation.amount
+        player.donatedItems[donation.itemId].history.push(donation)
+
+        if (player.pickedUpItems[donation.itemId] != null) {
+          if (player.resolvedItems[donation.itemId] == null) {
+            player.resolvedItems[donation.itemId] = {
+              id: donation.itemId,
+              amount: 0,
+              history: []
+            }
+          }
+
+          player.resolvedItems[donation.itemId].amount += donation.amount
+          player.resolvedItems[donation.itemId].history.push({
+            amount: donation.amount,
+            at: donation.donatedAt,
+            str: `picked up and donated`
+          })
+
+          if (donation.amount >= player.pickedUpItems[donation.itemId].amount) {
+            delete player.pickedUpItems[donation.itemId]
+          } else {
+            player.pickedUpItems[donation.itemId].amount -= donation.amount
+          }
+
+          player.amountOfPickedUpItems -= donation.amount
+        }
+      }
+
+      // filter players that didn't picked up anything
       for (const playerName in players) {
         const player = players[playerName]
 
-        for (const itemId in player.deathItems) {
-          if (player.items[itemId] == null) {
-            continue
-          }
+        const hasPickedUpItemsToShow = Object.keys(player.pickedUpItems).length
 
-          const item = player.deathItems[itemId]
-
-          if (item.amount >= player.items[itemId].amount) {
-            if (!state.filters.lost) {
-              delete player.items[itemId]
-            } else {
-              player.items[itemId].lostAll = true
-            }
-          } else {
-            player.items[itemId].amount -= item.amount
-          }
-
-          player.amountOfPickedUpItems -= item.amount
-        }
-
-        if (player.amountOfPickedUpItems <= 0) {
+        if (!hasPickedUpItemsToShow) {
           delete players[playerName]
         }
-      }
-
-      for (const playerName in players) {
-        const player = players[playerName]
-        const sortedItems = {}
-
-        const sortedKeys = Object.keys(player.items).sort((i1k, i2k) => {
-          const i1 = player.items[i1k]
-          const i2 = player.items[i2k]
-
-          const i1w = i1.lostAll ? 3 : i1.donatedAll ? 2 : 1
-          const i2w = i2.lostAll ? 3 : i2.donatedAll ? 2 : 1
-
-          return i1w - i2w
-        })
-
-        for (const key of sortedKeys) {
-          sortedItems[key] = player.items[key]
-        }
-
-        player.items = sortedItems
       }
 
       return deepFreeze(players)
@@ -324,6 +341,15 @@ export default new Vuex.Store({
       })
 
       return deepFreeze(filteredLoot)
+    },
+    filteredDonations(state, getters) {
+      const filteredDonations = getters.donatedLoot.filter(loot => {
+        const hideItem = getters.filterPatterns.some(pattern => loot.itemId.match(pattern))
+
+        return !hideItem
+      })
+
+      return deepFreeze(filteredDonations)
     },
     filterPatterns(state) {
       const filterPatterns = []
@@ -439,6 +465,7 @@ export default new Vuex.Store({
         filterPatterns.push(/_SKILLBOOK/)
         filterPatterns.push(/_SEAWEED/)
         filterPatterns.push(/QUESTITEM_EXP_TOKEN/)
+        filterPatterns.push(/QUESTITEM_TOKEN/)
         filterPatterns.push(/_VANITY_/)
 
         filterPatterns.push(/T\d_ROCK/)
