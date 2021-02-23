@@ -106,7 +106,7 @@ export default {
 .filters {
   display: grid;
   grid-gap: 1em;
-  grid-template-columns: repeat(auto-fit, minmax(50px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(40px, 1fr));
   width: 100%;
   text-align: center;
 }
