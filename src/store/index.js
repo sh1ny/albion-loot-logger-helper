@@ -1,10 +1,10 @@
 import Vue from "vue"
 import Vuex from "vuex"
-import moment from 'moment'
 
-import regex from '../utils/regex'
 import deepFreeze from '../utils/deepFreeze'
 import items from '../utils/items.json'
+import regex from '../utils/regex'
+import { strToDate } from '../utils/date'
 
 Vue.use(Vuex)
 
@@ -44,7 +44,7 @@ export default new Vuex.Store({
           continue
         }
 
-        const lootedAt = moment(result[1], 'DD/MM/YYYY hh:mm:ss')
+        const lootedAt = strToDate(result[1])
         const lootedBy = result[2]
         const itemId = result[3]
         const amount = parseInt(result[4], 10)
@@ -86,7 +86,7 @@ export default new Vuex.Store({
           continue
         }
 
-        const donatedAt = moment(result[1], 'MM/DD/YYYY hh:mm:ss')
+        const donatedAt = strToDate(result[1])
         const donatedBy = result[2]
         const itemName = result[3]
         const itemEnchant = parseInt(result[4], 10)

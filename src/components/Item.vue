@@ -7,6 +7,7 @@
 
 <script>
 import itemsIdToName from '../utils/items-id-to-name.json'
+import { dateToStr } from '../utils/date'
 
 export default {
   name: 'Item',
@@ -42,16 +43,16 @@ export default {
 
       if (this.type === 'donation') {
         strs = this.history
-          .map(e => `${e.amount}x donated at ${e.donatedAt.format('DD-MM-YYYY hh:mm:ss')}`)
+          .map(e => `${e.amount}x donated at ${dateToStr(e.donatedAt)}`)
       } else if (this.type === 'lost') {
         strs = this.history
-          .map(e => `${e.amount}x lost to ${e.lootedBy} at ${e.lootedAt.format('DD-MM-YYYY hh:mm:ss')}`)
+          .map(e => `${e.amount}x lost to ${e.lootedBy} at ${dateToStr(e.lootedAt)}`)
       } else if (this.type === 'resolved') {
         strs = this.history
-          .map(e => `${e.amount}x ${e.str} at ${e.at.format('DD-MM-YYYY hh:mm:ss')}`)
+          .map(e => `${e.amount}x ${e.str} at ${dateToStr(e.at)}`)
       } else {
         strs = this.history
-          .map(e => `${e.amount}x looted from ${e.lootedFrom} at ${e.lootedAt.format('DD-MM-YYYY hh:mm:ss')}`)
+          .map(e => `${e.amount}x looted from ${e.lootedFrom} at ${dateToStr(e.lootedAt)}`)
       }
 
       return [
