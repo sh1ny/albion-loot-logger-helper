@@ -102,7 +102,7 @@ export default {
       const droppedFiles = Array.from(event.dataTransfer.files)
 
       for (const file of droppedFiles) {
-        if (file.type !== "text/plain") {
+        if (file.type !== "text/plain" && file.type !== "text/csv") {
           return
         }
 
