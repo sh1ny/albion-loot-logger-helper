@@ -322,7 +322,7 @@ export default new Vuex.Store({
 
             // if looted from the same player, in a very short time window, it is
             // probably a duplicate
-            return diff <= 5000
+            return diff <= 30000
           })
 
           if (!isDuplicate) {
