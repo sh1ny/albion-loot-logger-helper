@@ -102,12 +102,6 @@ export default {
       const droppedFiles = Array.from(event.dataTransfer.files)
 
       for (const file of droppedFiles) {
-        console.log(file)
-
-        if (file.type !== "text/plain" && file.type !== "text/csv") {
-          return
-        }
-
         const reader = new FileReader()
 
         reader.onload = evt => this.processFile(evt.target.result)
