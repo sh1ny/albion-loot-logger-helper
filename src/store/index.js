@@ -318,11 +318,15 @@ export default new Vuex.Store({
               return false
             }
 
+            if (e.amount !== log.amount) {
+              return false
+            }
+
             const diff = Math.abs(e.lootedAt.diff(log.lootedAt))
 
             // if looted from the same player, in a very short time window, it is
             // probably a duplicate
-            return diff <= 30000
+            return diff <= 60000
           })
 
           if (!isDuplicate) {
