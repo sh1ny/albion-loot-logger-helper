@@ -306,15 +306,15 @@ export default new Vuex.Store({
         for (const log of logs) {
           const isDuplicate = loot.some(e => {
             // if the player looted different players, it is definetly not a duplicate.
+            if (e.itemId !== log.itemId) {
+              return false
+            }
+
             if (e.lootedFrom !== log.lootedFrom) {
               return false
             }
 
             if (e.lootedBy !== log.lootedBy) {
-              return false
-            }
-
-            if (e.itemId !== log.itemId) {
               return false
             }
 
@@ -326,7 +326,7 @@ export default new Vuex.Store({
 
             // if looted from the same player, in a very short time window, it is
             // probably a duplicate
-            return diff <= 60000
+            return diff <= 120000
           })
 
           if (!isDuplicate) {
