@@ -49,7 +49,21 @@ export default {
     ]),
     sortedFilteredPlayers() {
       return Object.values(this.filteredPlayers)
-        .sort((a, b) => b.amountOfPickedUpItems - a.amountOfPickedUpItems)
+        .sort((a, b) => {
+          if (a.amountOfPickedUpItems !== b.amountOfPickedUpItems) {
+            return b.amountOfPickedUpItems - a.amountOfPickedUpItems
+          }
+
+          if (this.filters.resolved && a.amountOfResolvedItems !== b.amountOfResolvedItems) {
+            return b.amountOfResolvedItems - a.amountOfResolvedItems
+          }
+
+          if (this.filters.donated && a.amountOfDonatedItems !== b.amountOfDonatedItems) {
+            return b.amountOfDonatedItems - a.amountOfDonatedItems
+          }
+
+          return 0
+        })
         .map(p => p.name)
     },
     slices() {

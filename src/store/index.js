@@ -276,6 +276,34 @@ export default new Vuex.Store({
         }
       }
 
+      for (const playerName in players) {
+        const player = players[playerName]
+
+        player.amountOfPickedUpItems = 0
+
+        for (const itemId in player.pickedUpItems) {
+          player.amountOfPickedUpItems += player.pickedUpItems[itemId].amount
+        }
+
+        player.amountOfResolvedItems = 0
+
+        for (const itemId in player.resolvedItems) {
+          player.amountOfResolvedItems += player.resolvedItems[itemId].amount
+        }
+
+        player.amountOfLostItems = 0
+
+        for (const itemId in player.lostItems) {
+          player.amountOfLostItems += player.lostItems[itemId].amount
+        }
+
+        player.amountOfDonatedItems = 0
+
+        for (const itemId in player.donatedItems) {
+          player.amountOfDonatedItems += player.donatedItems[itemId].amount
+        }
+      }
+
       // filter players that didn't picked up anything
       for (const playerName in players) {
         const player = players[playerName]
