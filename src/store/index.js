@@ -120,11 +120,16 @@ export default new Vuex.Store({
         }
       }
 
-      return deepFreeze(Object.values(donatedLoot))
+      const loot = Object.values(donatedLoot)
+
+      loot.sort((a, b) => b.itemId.localeCompare(a.itemId))
+
+      return deepFreeze(loot)
     },
     allPlayers(state, getters) {
       const players = {}
 
+      // PICK UP ITEMS
       for (const loot of getters.filteredLoot) {
         if (players[loot.lootedBy] == null) {
           players[loot.lootedBy] = {
@@ -151,6 +156,7 @@ export default new Vuex.Store({
         players[loot.lootedBy].pickedUpItems[loot.itemId].history.push(loot)
       }
 
+      // LOST ITEMS
       for (const loot of getters.filteredLoot) {
         if (players[loot.lootedFrom] == null) {
           players[loot.lootedFrom] = {
@@ -205,6 +211,7 @@ export default new Vuex.Store({
         }
       }
 
+      // DONATED ITEMS
       for (const donation of getters.filteredDonations) {
         if (players[donation.donatedBy] == null) {
           players[donation.donatedBy] = {
@@ -218,17 +225,10 @@ export default new Vuex.Store({
         }
 
         const player = players[donation.donatedBy]
-
-        if (player.donatedItems[donation.itemId] == null) {
-          player.donatedItems[donation.itemId] = {
-            id: donation.itemId,
-            amount: 0,
-            history: []
-          }
-        }
-
-        player.donatedItems[donation.itemId].amount += donation.amount
-        player.donatedItems[donation.itemId].history.push(donation)
+         
+        // initially, we consider that every item donated is an extra item.
+        // As we don't know if the user picked up this item yet.
+        let extraItemsDonated = donation.amount
 
         if (player.pickedUpItems[donation.itemId] != null) {
           if (player.resolvedItems[donation.itemId] == null) {
@@ -239,20 +239,40 @@ export default new Vuex.Store({
             }
           }
 
-          player.resolvedItems[donation.itemId].amount += donation.amount
-          player.resolvedItems[donation.itemId].history.push({
+          const pickedUpItem = player.pickedUpItems[donation.itemId]
+          const resolvedItem = player.resolvedItems[donation.itemId]
+
+          // now that we know this user donated some of this item, update `extraItemsDonated`
+          extraItemsDonated -= pickedUpItem.amount
+
+          resolvedItem.amount += donation.amount
+          resolvedItem.history.push({
             amount: donation.amount,
             at: donation.donatedAt,
             str: `picked up and donated`
           })
 
-          if (donation.amount >= player.pickedUpItems[donation.itemId].amount) {
+          if (donation.amount >= pickedUpItem.amount) {
             delete player.pickedUpItems[donation.itemId]
           } else {
-            player.pickedUpItems[donation.itemId].amount -= donation.amount
+            pickedUpItem.amount -= donation.amount
           }
 
           player.amountOfPickedUpItems -= donation.amount
+        }
+
+        // after considering the picked up items we still have extra items donated, add it the out list.
+        if (extraItemsDonated) {
+          if (player.donatedItems[donation.itemId] == null) {
+            player.donatedItems[donation.itemId] = {
+              id: donation.itemId,
+              amount: 0,
+              history: []
+            }
+          }
+
+          player.donatedItems[donation.itemId].amount += donation.amount
+          player.donatedItems[donation.itemId].history.push(donation)
         }
       }
 
@@ -260,11 +280,19 @@ export default new Vuex.Store({
       for (const playerName in players) {
         const player = players[playerName]
 
-        const hasPickedUpItemsToShow = Object.keys(player.pickedUpItems).length
-
-        if (!hasPickedUpItemsToShow) {
-          delete players[playerName]
+        if (Object.keys(player.pickedUpItems).length > 0) {
+          continue
         }
+
+        if (state.filters.resolved && Object.keys(player.resolvedItems).length > 0) {
+          continue
+        }
+
+        if (state.filters.donated && Object.keys(player.donatedItems).length > 0) {
+          continue
+        }
+
+        delete players[playerName]
       }
 
       return deepFreeze(players)
@@ -334,6 +362,8 @@ export default new Vuex.Store({
           }
         }
       }
+
+      loot.sort((a, b) => b.itemId.localeCompare(a.itemId))
 
       return deepFreeze(loot)
     },
