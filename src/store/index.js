@@ -514,6 +514,18 @@ export default new Vuex.Store({
         filterPatterns.push(/UNIQUE_MOUNT_UNDEAD_DIREBOAR_ADC/)
         filterPatterns.push(/UNIQUE_MOUNT_DIVINE_OWL_ADC/)
         filterPatterns.push(/UNIQUE_MOUNT_HERETIC_MULE_ADC/)
+        filterPatterns.push(/T5_MOUNT_MOABIRD_FW_BRIDGEWATCH/)
+        filterPatterns.push(/T5_MOUNT_DIREBEAR_FW_FORTSTERLING/)
+        filterPatterns.push(/T5_MOUNT_DIREBOAR_FW_LYMHURST/)
+        filterPatterns.push(/T5_MOUNT_RAM_FW_MARTLOCK/)
+        filterPatterns.push(/T5_MOUNT_SWAMPDRAGON_FW_THETFORD/)
+        filterPatterns.push(/T5_MOUNT_GREYWOLF_FW_CAERLEON/)
+        filterPatterns.push(/T8_MOUNT_MOABIRD_FW_BRIDGEWATCH_ELITE/)
+        filterPatterns.push(/T8_MOUNT_DIREBEAR_FW_FORTSTERLING_ELITE/)
+        filterPatterns.push(/T8_MOUNT_DIREBOAR_FW_LYMHURST_ELITE/)
+        filterPatterns.push(/T8_MOUNT_RAM_FW_MARTLOCK_ELITE/)
+        filterPatterns.push(/T8_MOUNT_SWAMPDRAGON_FW_THETFORD_ELITE/)
+        filterPatterns.push(/T8_MOUNT_GREYWOLF_FW_CAERLEON_ELITE/)
       }
 
       if (!state.filters.others) {
