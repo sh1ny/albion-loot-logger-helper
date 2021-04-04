@@ -93,6 +93,11 @@ export default new Vuex.Store({
         const amount = parseInt(result[5], 10)
 
         let itemId = items[itemName]
+        
+        if (itemId == null) {
+          console.error(`item not found: "${itemName}"`)
+          continue
+        }
 
         if (itemEnchant > 0 && itemId.indexOf('@') === -1) {
           itemId = `${itemId}@${itemEnchant}`
