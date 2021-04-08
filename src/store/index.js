@@ -559,6 +559,8 @@ export default new Vuex.Store({
         filterPatterns.push(/T\d_PLANKS/)
         filterPatterns.push(/T\d_HIDE/)
         filterPatterns.push(/T\d_LEATHER/)
+        
+        filterPatterns.push(/_ESSENCE/)
       }
 
       return deepFreeze(filterPatterns)
