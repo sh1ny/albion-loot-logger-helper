@@ -534,7 +534,12 @@ export default new Vuex.Store({
         filterPatterns.push(/_RUNE/)
         filterPatterns.push(/_SOUL/)
         filterPatterns.push(/_RELIC/)
-
+        filterPatterns.push(/_SHARD_AVALONIAN/)
+        
+        filterPatterns.push(/_RANDOM_DUNGEON_ELITE_TOKEN_/)
+        filterPatterns.push(/_RANDOM_DUNGEON_SOLO_TOKEN_/)
+        filterPatterns.push(/_RANDOM_DUNGEON_TOKEN_/)
+        
         filterPatterns.push(/_FARM/)
         filterPatterns.push(/_TOOL_/)
         filterPatterns.push(/_GVGTOKEN_/)
